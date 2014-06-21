@@ -40,6 +40,9 @@ public class GhprbTrigger extends Trigger<AbstractProject<?, ?>> {
     private final String orgslist;
     private final String cron;
     private final String triggerPhrase;
+    private final String msgStarted;
+    private final String msgSuccess;
+    private final String msgFailure;
     private final Boolean onlyTriggerPhrase;
     private final Boolean useGitHubHooks;
     private final Boolean permitAll;
@@ -54,6 +57,9 @@ public class GhprbTrigger extends Trigger<AbstractProject<?, ?>> {
                         String orgslist,
                         String cron,
                         String triggerPhrase,
+                        String msgStarted,
+                        String msgSuccess,
+                        String msgFailure,
                         Boolean onlyTriggerPhrase,
                         Boolean useGitHubHooks,
                         Boolean permitAll,
@@ -65,6 +71,9 @@ public class GhprbTrigger extends Trigger<AbstractProject<?, ?>> {
         this.orgslist = orgslist;
         this.cron = cron;
         this.triggerPhrase = triggerPhrase;
+        this.msgStarted = msgStarted;
+        this.msgSuccess = msgSuccess;
+        this.msgFailure = msgFailure;
         this.onlyTriggerPhrase = onlyTriggerPhrase;
         this.useGitHubHooks = useGitHubHooks;
         this.permitAll = permitAll;
@@ -241,6 +250,28 @@ public class GhprbTrigger extends Trigger<AbstractProject<?, ?>> {
         }
     }
 
+    public String getMsgStarted() {
+    	if(msgStarted == null) {
+    		return DESCRIPTOR.getMsgStarted();
+    	}
+    	return msgStarted;
+    }
+
+    public String getMsgSuccess() {
+    	if(msgSuccess == null) {
+    		return DESCRIPTOR.getMsgSuccess();
+    	}
+    	return msgSuccess;
+    }
+
+    public String getMsgFailure() {
+    	if(msgFailure == null) {
+    		return DESCRIPTOR.getMsgFailure();
+    	}
+    	return msgFailure;
+    }
+
+
     public List<GhprbBranch> getWhiteListTargetBranches() {
         if (whiteListTargetBranches == null) {
             return new ArrayList<GhprbBranch>();
@@ -286,8 +317,9 @@ public class GhprbTrigger extends Trigger<AbstractProject<?, ?>> {
         private int logExcerptLines = 0;
         private String unstableAs = GHCommitState.FAILURE.name();
         private Boolean autoCloseFailedPullRequests = false;
-        private String msgSuccess = "Test PASSed.";
-        private String msgFailure = "Test FAILed.";
+        private String msgSuccess;
+        private String msgFailure;
+        private String msgStarted;
         private List<GhprbBranch> whiteListTargetBranches;
         private transient GhprbGitHub gh;
         // map of jobs (by their fullName) abd their map of pull requests
@@ -329,6 +361,7 @@ public class GhprbTrigger extends Trigger<AbstractProject<?, ?>> {
             autoCloseFailedPullRequests = formData.getBoolean("autoCloseFailedPullRequests");
             msgSuccess = formData.getString("msgSuccess");
             msgFailure = formData.getString("msgFailure");
+            msgStarted = formData.getString("msgStarted");
             save();
             gh = new GhprbGitHub();
             return super.configure(req, formData);
@@ -424,6 +457,13 @@ public class GhprbTrigger extends Trigger<AbstractProject<?, ?>> {
             }
             return msgFailure;
         }
+
+		public String getMsgStarted() {
+			if(msgStarted == null){
+				return "Build started.";
+			}
+			return msgStarted;
+		}
 
         public boolean isUseComments() {
             return (useComments != null && useComments);

@@ -30,14 +30,10 @@ public class GhprbBuilds {
     public String build(GhprbPullRequest pr) {
         StringBuilder sb = new StringBuilder();
         if (cancelBuild(pr.getId())) {
-            sb.append("Previous build stopped.");
+            sb.append("Previous build stopped. ");
         }
 
-        if (pr.isMergeable()) {
-            sb.append(" Merged build triggered.");
-        } else {
-            sb.append(" Build triggered.");
-        }
+        sb.append(trigger.getMsgStarted());
 
         GhprbCause cause = new GhprbCause(pr.getHead(), pr.getId(), pr.isMergeable(), pr.getTarget(), pr.getSource(), pr.getAuthorEmail(), pr.getTitle(), pr.getUrl());
 
@@ -64,7 +60,7 @@ public class GhprbBuilds {
             return;
         }
 
-        repo.createCommitStatus(build, GHCommitState.PENDING, (c.isMerged() ? "Merged build started." : "Build started."), c.getPullID());
+        repo.createCommitStatus(build, GHCommitState.PENDING, trigger.getMsgStarted(), c.getPullID());
         try {
             build.setDescription("<a title=\"" + c.getTitle() + "\" href=\"" + c.getUrl() + "\">PR #" + c.getPullID() + "</a>: " + c.getAbbreviatedTitle());
         } catch (IOException ex) {
@@ -100,17 +96,17 @@ public class GhprbBuilds {
         } else {
             state = GHCommitState.FAILURE;
         }
-        repo.createCommitStatus(build, state, (c.isMerged() ? "Merged build finished." : "Build finished."), c.getPullID());
+
+        StringBuilder msg = new StringBuilder();
+        if (state == GHCommitState.SUCCESS) {
+            msg = trigger.getMsgSuccess();
+        } else {
+            msg = trigger.getMsgFailure();
+        }
+        repo.createCommitStatus(build, state, msg, c.getPullID());
 
         String publishedURL = GhprbTrigger.getDscp().getPublishedURL();
         if (publishedURL != null && !publishedURL.isEmpty()) {
-            StringBuilder msg = new StringBuilder();
-
-            if (state == GHCommitState.SUCCESS) {
-                msg.append(GhprbTrigger.getDscp().getMsgSuccess());
-            } else {
-                msg.append(GhprbTrigger.getDscp().getMsgFailure());
-            }
             msg.append("\nRefer to this link for build results: ");
             msg.append(publishedURL).append(build.getUrl());
 
