@@ -99,11 +99,11 @@ public class GhprbBuilds {
 
         StringBuilder msg = new StringBuilder();
         if (state == GHCommitState.SUCCESS) {
-            msg = trigger.getMsgSuccess();
+            msg.append(trigger.getMsgSuccess());
         } else {
-            msg = trigger.getMsgFailure();
+            msg.append(trigger.getMsgFailure());
         }
-        repo.createCommitStatus(build, state, msg, c.getPullID());
+        repo.createCommitStatus(build, state, msg.toString(), c.getPullID());
 
         String publishedURL = GhprbTrigger.getDscp().getPublishedURL();
         if (publishedURL != null && !publishedURL.isEmpty()) {

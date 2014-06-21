@@ -106,7 +106,9 @@ public class GhprbIT {
         // GIVEN
         FreeStyleProject project = jenkinsRule.createFreeStyleProject("PRJ");
         GhprbTrigger trigger = new GhprbTrigger(
-                "user", "user", "", "*/1 * * * *", "retest this please", false, false, false, false, null
+                "user", "user", "", "*/1 * * * *", "retest this please",
+                "msgStarted", "Success message", "Failure message",
+                false, false, false, false, null
         );
         given(commitPointer.getSha()).willReturn("sha");
         JSONObject jsonObject = provideConfiguration();
@@ -140,7 +142,9 @@ public class GhprbIT {
         // GIVEN
         FreeStyleProject project = jenkinsRule.createFreeStyleProject("PRJ");
         GhprbTrigger trigger = new GhprbTrigger(
-                "user", "user", "", "*/1 * * * *", "retest this please", false, false, false, false, null
+                "user", "user", "", "*/1 * * * *", "retest this please",
+                "Pending message", "Success message", "Failure message",
+                false, false, false, false, null
         );
         given(commitPointer.getSha()).willReturn("sha").willReturn("sha").willReturn("newOne").willReturn("newOne");
         given(ghPullRequest.getComments()).willReturn(Lists.<GHIssueComment>newArrayList());
@@ -168,7 +172,9 @@ public class GhprbIT {
         // GIVEN
         FreeStyleProject project = jenkinsRule.createFreeStyleProject("PRJ");
         GhprbTrigger trigger = new GhprbTrigger(
-                "user", "user", "", "*/1 * * * *", "retest this please", false, false, false, false, null
+                "user", "user", "", "*/1 * * * *", "retest this please",
+                "Pending message", "Success message", "Failure message",
+                false, false, false, false, null
         );
 
         given(commitPointer.getSha()).willReturn("sha");
@@ -252,6 +258,8 @@ public class GhprbIT {
         jsonObject.put("autoCloseFailedPullRequests", "false");
         jsonObject.put("msgSuccess", "Success");
         jsonObject.put("msgFailure", "Failure");
+        jsonObject.put("msgStarted", "Started");
+
 
         return jsonObject;
     }
