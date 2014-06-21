@@ -114,14 +114,10 @@ public class GhprbBuilds {
             if (state != GHCommitState.SUCCESS && numLines > 0) {
                 // on failure, append an excerpt of the build log
                 try {
-                    // wrap log in "code" markdown
-                    msg.append("\n\n**Build Log**\n*last ").append(numLines).append(" lines*\n");
-                    msg.append("\n ```\n");
                     List<String> log = build.getLog(numLines);
                     for (String line : log) {
                         msg.append(line).append('\n');
                     }
-                    msg.append("```\n");
                 } catch (IOException ex) {
                     logger.log(Level.WARNING, "Can't add log excerpt to commit comments", ex);
                 }
